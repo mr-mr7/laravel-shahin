@@ -15,8 +15,8 @@ class TokenService extends ShahinService
     public function getTwoWayToken($bank = null, $clientId = null, $clientSecret = null): array
     {
         $userCredentials = Shahin::getUserCredentials();
-        $clientId = $clientId ?? $userCredentials['client_id'] ?? config('shahin.client_id');
-        $clientSecret = $clientSecret ?? $userCredentials['client_secret'] ?? config('shahin.client_secret');
+        $clientId = $clientId ?? $userCredentials['client_id'] ?? '';
+        $clientSecret = $clientSecret ?? $userCredentials['client_secret'] ?? '';
 
         return $this->sendRequest(new TwoWayTokenRequest($bank, $clientId, $clientSecret));
     }
@@ -28,7 +28,7 @@ class TokenService extends ShahinService
     {
         $tokenStorage = app(TokenStorageInterface::class);
         $bank = $bank ?? Shahin::bank();
-        if (! $tokenStorage->has($bank) && $createIfNotExists) {
+        if (!$tokenStorage->has($bank) && $createIfNotExists) {
             $this->setToken($bank, $clientId, $clientSecret);
         }
         $tokenData = $tokenStorage->get($bank);
@@ -61,7 +61,7 @@ class TokenService extends ShahinService
         $tokenStorage = app(TokenStorageInterface::class);
         $bank = Shahin::bank();
 
-        if (! $tokenStorage->has($bank)) {
+        if (!$tokenStorage->has($bank)) {
             $this->setToken($bank);
         }
         $tokenData = $tokenStorage->get($bank);

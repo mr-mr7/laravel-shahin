@@ -13,19 +13,19 @@ class ShahinManager
 
     private string|int|null $userIdentifier = null;
 
-    private array $credentials = [];
+    private array $userCredentials = [];
 
     public function forUser(string|int $userIdentifier, array $credentials = []): self
     {
         $this->userIdentifier = $userIdentifier;
-        $this->credentials = $credentials;
+        $this->userCredentials = $credentials;
 
         return $this;
     }
 
     public function getUserCredentials(): array
     {
-        return $this->credentials;
+        return $this->userIdentifier ? $this->userCredentials : ['client_id' => config('shahin.client_id'), 'client_secret' => config('shahin.client_secret')];
     }
 
     public function getUserIdentifier(): string|int|null
@@ -58,7 +58,7 @@ class ShahinManager
 
     protected function getService(string $class)
     {
-        if (! isset($this->services[$class])) {
+        if (!isset($this->services[$class])) {
             $this->services[$class] = app($class);
         }
 
