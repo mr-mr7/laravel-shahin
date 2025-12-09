@@ -28,7 +28,7 @@ class TokenService extends ShahinService
     {
         $tokenStorage = app(TokenStorageInterface::class);
         $bank = $bank ?? Shahin::bank();
-        if (!$tokenStorage->has($bank) && $createIfNotExists) {
+        if (! $tokenStorage->has($bank) && $createIfNotExists) {
             $this->setToken($bank, $clientId, $clientSecret);
         }
         $tokenData = $tokenStorage->get($bank);
@@ -61,7 +61,7 @@ class TokenService extends ShahinService
         $tokenStorage = app(TokenStorageInterface::class);
         $bank = Shahin::bank();
 
-        if (!$tokenStorage->has($bank)) {
+        if (! $tokenStorage->has($bank)) {
             $this->setToken($bank);
         }
         $tokenData = $tokenStorage->get($bank);

@@ -43,8 +43,9 @@ abstract class ShahinService
             foreach ($requests as $requestItem) {
                 $method = $requestItem->method;
                 $baseUrl = "$this->baseUrl:$requestItem->port";
+                $key = class_basename($requestItem).'-'.$i++;
 
-                $pendingRequest = $pool->baseUrl($baseUrl)
+                $pendingRequest = $pool->as($key)->baseUrl($baseUrl)
                     ->withoutVerifying(); // TODO: Must Be Remove
 
                 $pendingRequest = $requestItem->prepare($pendingRequest);
@@ -53,7 +54,7 @@ abstract class ShahinService
                     $pendingRequest->withToken($token);
                 }
 
-                $poolRequests[class_basename($requestItem).'-'.$i++] = $pendingRequest
+                $poolRequests[] = $pendingRequest
                     ->withHeaders(array_merge([
                         'Content_Type' => 'application/json',
                         'X-Obh-timestamp' => now()->getTimestampMs(),
@@ -69,8 +70,7 @@ abstract class ShahinService
 
         if (! $multiRequest) {
             $response = Arr::first($poolResponses);
-
-            if ($response->successful() && $response->json('transactionState') == 'SUCCESS') {
+            if ($request->successResponseCondition($response)) {
                 return $response->json($responseKey);
             }
             throw new ShahinException($response->body(), $response->status());
@@ -78,7 +78,8 @@ abstract class ShahinService
 
         $responses = [];
         foreach ($poolResponses as $key => $poolResponse) {
-            if ($poolResponse->successful() && $poolResponse->json('transactionState') == 'SUCCESS') {
+            $relatedRequest = $request[explode('-', $key)[1]];
+            if ($relatedRequest->successResponseCondition($poolResponse)) {
                 $responses['data'][] = $poolResponse->json($responseKey);
             } else {
                 $responses['errors'][$key] = $poolResponse->body();

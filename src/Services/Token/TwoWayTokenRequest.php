@@ -2,6 +2,7 @@
 
 namespace Mrmr7\LaravelShahin\Services\Token;
 
+use Illuminate\Http\Client\Response;
 use Mrmr7\LaravelShahin\Contracts\Request;
 
 class TwoWayTokenRequest extends Request
@@ -26,6 +27,12 @@ class TwoWayTokenRequest extends Request
     {
         parent::prepare($http);
         $http->withBasicAuth($this->clientId, $this->clientSecret);
+
         return $http;
+    }
+
+    public function successResponseCondition(Response $response): bool
+    {
+        return $response->successful() && $response->json('access_token');
     }
 }

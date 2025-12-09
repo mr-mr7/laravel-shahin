@@ -58,7 +58,7 @@ class ShahinManager
 
     protected function getService(string $class)
     {
-        if (!isset($this->services[$class])) {
+        if (! isset($this->services[$class])) {
             $this->services[$class] = app($class);
         }
 

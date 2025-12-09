@@ -2,6 +2,8 @@
 
 namespace Mrmr7\LaravelShahin\Contracts;
 
+use Illuminate\Http\Client\Response;
+
 /**
  * هر رکوئستی که قراره سمت سامانه شاهین ارسال بشه باید از این کلاس اکستند بشه
  * EXP: AccountStatementRequest, TwoWayTokenRequest
@@ -44,5 +46,10 @@ abstract class Request
     public function prepare(\Illuminate\Http\Client\Factory|\Illuminate\Http\Client\PendingRequest|\Illuminate\Http\Client\Pool $http): \Illuminate\Http\Client\Factory|\Illuminate\Http\Client\PendingRequest|\Illuminate\Http\Client\Pool
     {
         return $http;
+    }
+
+    public function successResponseCondition(Response $response): bool
+    {
+        return $response->successful() && $response->json('transactionState') == 'SUCCESS';
     }
 }
