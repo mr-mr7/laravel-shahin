@@ -9,7 +9,19 @@ This is where your description should go. Limit it to a paragraph or two. Consid
 
 ## Installation
 
-You can install the package via composer:
+First add this repository into composer.json file
+``` json
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "https://github.com/mr-mr7/laravel-shahin"
+    }
+    // Other repositories
+],
+```
+
+Then you can install the package via composer:
+
 
 ```bash
 composer require mr-mr7/laravel-shahin
