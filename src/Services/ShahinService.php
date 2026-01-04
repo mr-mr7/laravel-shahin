@@ -47,7 +47,7 @@ abstract class ShahinService
             $i = 0;
             foreach ($requests as $requestItem) {
                 $method = $requestItem->method;
-                $baseUrl = "$this->baseUrl:$requestItem->port";
+                $baseUrl = "$this->baseUrl:".$requestItem->port();
                 $key = class_basename($requestItem).'-'.$i++;
 
                 $pendingRequest = $pool->as($key)->baseUrl($baseUrl);

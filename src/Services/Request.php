@@ -14,6 +14,8 @@ abstract class Request
 
     public int $port;
 
+    protected bool $isSandbox;
+
     public string $endPoint;
 
     protected array $headers = [];
@@ -25,6 +27,7 @@ abstract class Request
     public function __construct()
     {
         $this->port = config('shahin.port_1way_without_signature');
+        $this->isSandbox = config('shahin.sandbox');
     }
 
     public function getBody(): array
@@ -51,5 +54,10 @@ abstract class Request
     public function successResponseCondition(Response $response): bool
     {
         return $response->successful() && $response->json('transactionState') == 'SUCCESS';
+    }
+
+    public function port(): string|int
+    {
+        return $this->isSandbox ? config('shahin.sandbox_port') : $this->port;
     }
 }

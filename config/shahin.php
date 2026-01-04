@@ -6,6 +6,7 @@ return [
     'sandbox' => true, // If true sandbox is enabled
     'base_url' => env('SHAHIN_BASE_URL'),
     'sandbox_base_url' => env('SHAHIN_SANDBOX_BASE_URL', 'https://10.10.10.112'),
+    'sandbox_port' => env('SHAHIN_SANDBOX_PORT', '28453'),
     'port' => env('SHAHIN_PORT', '28453'),
     'port_1way_without_signature' => env('PORT_1WAY_WITHOUT_SIGNATURE', '38453'),
     'port_1way_with_signature' => env('PORT_1WAY_WITH_SIGNATURE', '58453'),
