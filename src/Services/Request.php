@@ -1,6 +1,6 @@
 <?php
 
-namespace Mrmr7\LaravelShahin\Contracts;
+namespace Mrmr7\LaravelShahin\Services;
 
 use Illuminate\Http\Client\Response;
 

@@ -3,7 +3,7 @@
 namespace Mrmr7\LaravelShahin\Services\Token;
 
 use Illuminate\Http\Client\Response;
-use Mrmr7\LaravelShahin\Contracts\Request;
+use Mrmr7\LaravelShahin\Services\Request;
 
 class TwoWayTokenRequest extends Request
 {

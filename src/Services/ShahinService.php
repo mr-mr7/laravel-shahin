@@ -1,11 +1,13 @@
 <?php
 
-namespace Mrmr7\LaravelShahin\Contracts;
+namespace Mrmr7\LaravelShahin\Services;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Mrmr7\LaravelShahin\Contracts\HasToken;
 use Mrmr7\LaravelShahin\Exceptions\ShahinException;
 use Mrmr7\LaravelShahin\Facades\Shahin;
 
@@ -17,11 +19,14 @@ use Mrmr7\LaravelShahin\Facades\Shahin;
  */
 abstract class ShahinService
 {
-    private $baseUrl = '';
+    private string $baseUrl = '';
+
+    private bool $isSandbox;
 
     public function __construct(private ?string $token = null)
     {
         $this->baseUrl = config('shahin.sandbox') === true ? config('shahin.sandbox_base_url') : config('shahin.base_uri');
+        $this->isSandbox = config('shahin.sandbox') === true;
     }
 
     /**
@@ -45,8 +50,11 @@ abstract class ShahinService
                 $baseUrl = "$this->baseUrl:$requestItem->port";
                 $key = class_basename($requestItem).'-'.$i++;
 
-                $pendingRequest = $pool->as($key)->baseUrl($baseUrl)
-                    ->withoutVerifying(); // TODO: Must Be Remove
+                $pendingRequest = $pool->as($key)->baseUrl($baseUrl);
+
+                if ($this->isSandbox) {
+                    $pendingRequest->withoutVerifying();
+                }
 
                 $pendingRequest = $requestItem->prepare($pendingRequest);
                 if ($requestItem instanceof HasToken) {
@@ -70,7 +78,9 @@ abstract class ShahinService
 
         if (! $multiRequest) {
             $response = Arr::first($poolResponses);
-            if ($request->successResponseCondition($response)) {
+            if ($response instanceof ConnectionException) {
+                throw $response;
+            } elseif ($request->successResponseCondition($response)) {
                 return $response->json($responseKey);
             }
             throw new ShahinException($response->body(), $response->status());
@@ -79,7 +89,9 @@ abstract class ShahinService
         $responses = [];
         foreach ($poolResponses as $key => $poolResponse) {
             $relatedRequest = $request[explode('-', $key)[1]];
-            if ($relatedRequest->successResponseCondition($poolResponse)) {
+            if ($poolResponse instanceof ConnectionException) {
+                $responses['errors'][$key] = $poolResponse->getMessage();
+            } elseif ($relatedRequest->successResponseCondition($poolResponse)) {
                 $responses['data'][] = $poolResponse->json($responseKey);
             } else {
                 $responses['errors'][$key] = $poolResponse->body();

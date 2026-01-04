@@ -2,10 +2,10 @@
 
 namespace Mrmr7\LaravelShahin\Services\Token;
 
-use Mrmr7\LaravelShahin\Contracts\ShahinService;
 use Mrmr7\LaravelShahin\Contracts\TokenStorageInterface;
 use Mrmr7\LaravelShahin\Exceptions\ShahinTokenNotFoundException;
 use Mrmr7\LaravelShahin\Facades\Shahin;
+use Mrmr7\LaravelShahin\Services\ShahinService;
 
 class TokenService extends ShahinService
 {

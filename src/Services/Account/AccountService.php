@@ -3,9 +3,9 @@
 namespace Mrmr7\LaravelShahin\Services\Account;
 
 use Carbon\Carbon;
-use Mrmr7\LaravelShahin\Contracts\ShahinService;
 use Mrmr7\LaravelShahin\Exceptions\ShahinException;
 use Mrmr7\LaravelShahin\Facades\Shahin;
+use Mrmr7\LaravelShahin\Services\ShahinService;
 
 class AccountService extends ShahinService
 {

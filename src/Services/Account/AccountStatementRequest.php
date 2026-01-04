@@ -3,7 +3,7 @@
 namespace Mrmr7\LaravelShahin\Services\Account;
 
 use Mrmr7\LaravelShahin\Contracts\HasToken;
-use Mrmr7\LaravelShahin\Contracts\Request;
+use Mrmr7\LaravelShahin\Services\Request;
 
 class AccountStatementRequest extends Request implements HasToken
 {
