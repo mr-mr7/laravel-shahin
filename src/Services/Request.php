@@ -14,7 +14,7 @@ abstract class Request
 
     protected int $port = 38453;
 
-    protected string $version = '0.3';
+    protected string $urlVersion = '0.3';
 
     protected bool $isSandbox;
 
@@ -62,8 +62,8 @@ abstract class Request
         return $this->port;
     }
 
-    public function version(): string
+    public function urlVersion(): string
     {
-        return $this->version;
+        return $this->urlVersion;
     }
 }

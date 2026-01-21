@@ -32,7 +32,7 @@ abstract class ShahinService
     /**
      * Sends a request to the API server.
      *
-     * @param  Request|Request[]  $request  The request to send.
+     * @param Request|Request[] $request The request to send.
      * @return mixed The response from API server.
      *
      * @throws ShahinException
@@ -47,9 +47,9 @@ abstract class ShahinService
             $i = 0;
             foreach ($requests as $requestItem) {
                 $method = $requestItem->method;
-                $baseUrl = "$this->baseUrl:".$requestItem->port().'/v'.$requestItem->version();
+                $baseUrl = "$this->baseUrl:" . $requestItem->port() . '/v' . $requestItem->urlVersion();
 
-                $key = class_basename($requestItem).'-'.$i++;
+                $key = class_basename($requestItem) . '-' . $i++;
 
                 $pendingRequest = $pool->as($key)->baseUrl($baseUrl);
 
@@ -64,12 +64,7 @@ abstract class ShahinService
                 }
 
                 $poolRequests[] = $pendingRequest
-                    ->withHeaders(array_merge([
-                        'Content_Type' => 'application/json',
-                        'X-Obh-timestamp' => now()->getTimestampMs(),
-                        'X-Obh-uuid' => Str::uuid()->toString(),
-                        'X-Obh-signature' => $this->sign(),
-                    ], $requestItem->getHeaders()))
+                    ->withHeaders(array_merge($this->signHeaders($method, $requestItem->urlVersion(), $requestItem->endPoint, $requestItem->getBody()), $requestItem->getHeaders()))
                     ->withQueryParameters($requestItem->getParams())
                     ->$method($requestItem->endPoint, $requestItem->getBody());
             }
@@ -77,7 +72,7 @@ abstract class ShahinService
             return $poolRequests;
         });
 
-        if (! $multiRequest) {
+        if (!$multiRequest) {
             $response = Arr::first($poolResponses);
             if ($response instanceof ConnectionException) {
                 throw $response;
@@ -102,8 +97,31 @@ abstract class ShahinService
         return $responses;
     }
 
-    private function sign()
+    private function signHeaders($method, $urlVersion, $endpoint, $data): array
     {
-        return 'OBH1-HMAC-SHA256;SignedHeaders=X-Obh-uuid,X-Obh-timestamp;Signature=77076581D9CA5A5F99A1020BBBD4E113B6CAA41BEE22B9665670793625FF244';
+        $uuid = Str::uuid()->toString();
+        $year = date('Y');
+        $clientId = config('shahin.client_id');
+        $clientSecret = config('shahin.client_secret');
+        $timestamp = time() * 1000;
+        $key = $year . $clientId . $clientSecret;
+        $keySign = hash('sha256', $key, 1);
+        $dataFinalJson = json_encode($data, JSON_UNESCAPED_UNICODE);
+        $dataPayload = $dataFinalJson;
+        $dataPayload = str_replace('"', '', $dataPayload);
+        $dataPayload = str_replace(':', '=', $dataPayload);
+        $dataPayload = str_replace(' ', '', $dataPayload);
+        $signBody = strtoupper(hash('sha256', $dataPayload));
+        $canonical = $method . "\n/" . $urlVersion . $endpoint . "\nx-obh-timestamp:$timestamp\nx-obh-uuid:$uuid\n\nx-obh-timestamp;x-obh-uuid\n$signBody";
+        $string2sign = strtoupper(hash('sha256', $canonical));
+        $finalSign = strtoupper(hash_hmac('sha256', $string2sign, $keySign, 0));
+
+        return [
+            'Content_Type' => 'application/json',
+            'charset' => 'utf-8',
+            'X-Obh-timestamp' => $timestamp,
+            'X-Obh-uuid' => $uuid,
+            'X-Obh-signature' => 'OBH1-HMAC-SHA256;SignedHeaders=X-Obh-uuid,X-Obh-timestamp;signature=' . $finalSign,
+        ];
     }
 }
