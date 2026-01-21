@@ -12,9 +12,9 @@ abstract class Request
 {
     public string $method = 'POST';
 
-    public int $port = 38453;
+    protected int $port = 38453;
 
-    public string $version = '0.3';
+    protected string $version = '0.3';
 
     protected bool $isSandbox;
 
@@ -59,6 +59,11 @@ abstract class Request
 
     public function port(): string|int
     {
-        return $this->port ?? config('shahin.port_1way_without_signature');
+        return $this->port;
+    }
+
+    public function version(): string
+    {
+        return $this->version;
     }
 }

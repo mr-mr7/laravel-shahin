@@ -47,7 +47,7 @@ abstract class ShahinService
             $i = 0;
             foreach ($requests as $requestItem) {
                 $method = $requestItem->method;
-                $baseUrl = "$this->baseUrl:".$requestItem->port()."/v{$requestItem->version}";
+                $baseUrl = "$this->baseUrl:".$requestItem->port().'/v'.$requestItem->version();
 
                 $key = class_basename($requestItem).'-'.$i++;
 
