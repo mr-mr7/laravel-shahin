@@ -7,7 +7,7 @@ use Mrmr7\LaravelShahin\Services\Request;
 
 class AccountStatementRequest extends Request implements HasToken
 {
-    public string $endPoint = 'v0.3/obh/api/aisp/get-account-statement';
+    public string $endPoint = 'obh/api/aisp/get-account-statement';
 
     public function __construct(private $bank, private $nationalCode, private $sourceAccount, private $fromDate = null, private $fromTime = null, private $toDate = null, private $toTime = null)
     {

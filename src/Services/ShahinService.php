@@ -25,8 +25,8 @@ abstract class ShahinService
 
     public function __construct(private ?string $token = null)
     {
-        $this->baseUrl = config('shahin.sandbox') === true ? config('shahin.sandbox_base_url') : config('shahin.base_uri');
-        $this->isSandbox = config('shahin.sandbox') === true;
+        $this->isSandbox = config('shahin.sandbox');
+        $this->baseUrl = $this->isSandbox ? config('shahin.sandbox_base_url') : config('shahin.base_uri');
     }
 
     /**
@@ -47,7 +47,8 @@ abstract class ShahinService
             $i = 0;
             foreach ($requests as $requestItem) {
                 $method = $requestItem->method;
-                $baseUrl = "$this->baseUrl:".$requestItem->port();
+                $baseUrl = "$this->baseUrl:".$requestItem->port()."/v{$requestItem->version}";
+
                 $key = class_basename($requestItem).'-'.$i++;
 
                 $pendingRequest = $pool->as($key)->baseUrl($baseUrl);
