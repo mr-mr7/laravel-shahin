@@ -30,7 +30,7 @@ composer require mr-mr7/laravel-shahin
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-shahin-config"
+php artisan vendor:publish --tag="shahin-config"
 ```
 
 
