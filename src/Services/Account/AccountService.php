@@ -23,7 +23,8 @@ class AccountService extends ShahinService
         $requests = [];
 
         foreach ($allowedAccounts as $allowedAccount) {
-            $requests[] = new AccountInfoRequest($bank, $nationalCode, $allowedAccount);
+            $request = new AccountInfoRequest($bank, $nationalCode, $allowedAccount);
+            $requests[] = $request->setRequestKey("accountInfo-$allowedAccount");
         }
 
         return $this->sendRequest($sourceAccount ? $requests[0] : $requests, 'respObject');
@@ -44,7 +45,7 @@ class AccountService extends ShahinService
 
         foreach ($allowedAccounts as $allowedAccount) {
             $request = new AccountBalanceRequest($bank, $nationalCode, $allowedAccount);
-            $requests[] = $request->setRequestKey($allowedAccount);
+            $requests[] = $request->setRequestKey("accountBalance-$allowedAccount");
         }
 
         return $this->sendRequest($sourceAccount ? $requests[0] : $requests, 'respObject');
@@ -66,7 +67,7 @@ class AccountService extends ShahinService
 
         foreach ($allowedAccounts as $allowedAccount) {
             $request = new AccountListRequest($bank, $nationalCode, $allowedAccount);
-            $requests[] = $request->setRequestKey($allowedAccount);
+            $requests[] = $request->setRequestKey("accountList-$allowedAccount");
         }
 
         return $this->sendRequest($sourceAccount ? $requests[0] : $requests, 'respObject.accounts');
@@ -96,7 +97,8 @@ class AccountService extends ShahinService
         $requests = [];
 
         foreach ($allowedAccounts as $allowedAccount) {
-            $requests[] = new AccountStatementRequest($bank, $nationalCode, $allowedAccount, $fromDate, $fromTime, $toDate, $toTime);
+            $request = new AccountStatementRequest($bank, $nationalCode, $allowedAccount, $fromDate, $fromTime, $toDate, $toTime);
+            $requests[] = $request->setRequestKey("accountStatement-$allowedAccount");
         }
 
         return $this->sendRequest($sourceAccount ? $requests[0] : $requests, 'respObject.accountStatementList');
