@@ -44,7 +44,7 @@ class AccountService extends ShahinService
 
         foreach ($allowedAccounts as $allowedAccount) {
             $request = new AccountBalanceRequest($bank, $nationalCode, $allowedAccount);
-            $requests[$allowedAccount] = $request->setRequestKey($allowedAccount);
+            $requests[] = $request->setRequestKey($allowedAccount);
         }
 
         return $this->sendRequest($sourceAccount ? $requests[0] : $requests, 'respObject');
