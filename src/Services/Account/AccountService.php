@@ -51,6 +51,28 @@ class AccountService extends ShahinService
 
     }
 
+    public function accountList($sourceAccount = null): array
+    {
+        $bank = Shahin::bank();
+        $nationalCode = Shahin::token()->getUsername();
+        $allAccounts = Shahin::token()->getAccounts();
+
+        if (! is_null($sourceAccount) && ! in_array($sourceAccount, $allAccounts)) {
+            throw new ShahinException('شماره حساب مجاز نمیباشد');
+        }
+
+        $allowedAccounts = ! is_null($sourceAccount) ? [$sourceAccount] : $allAccounts;
+        $requests = [];
+
+        foreach ($allowedAccounts as $allowedAccount) {
+            $request = new AccountListRequest($bank, $nationalCode, $allowedAccount);
+            $requests[] = $request->setRequestKey($allowedAccount);
+        }
+
+        return $this->sendRequest($sourceAccount ? $requests[0] : $requests, 'respObject.accounts');
+
+    }
+
     public function accountStatement($sourceAccount = null, ?Carbon $fromDateTime = null, ?Carbon $toDateTime = null): array
     {
         $bank = Shahin::bank();
