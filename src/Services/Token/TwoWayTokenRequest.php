@@ -7,12 +7,13 @@ use Mrmr7\LaravelShahin\Services\Request;
 
 class TwoWayTokenRequest extends Request
 {
-    public string $endPoint = 'v0.3/obh/oauth/token';
+    public string $endPoint = 'obh/oauth/token';
+
+    protected int $port = 28453;
 
     public function __construct(private $bank, private $clientId, private $clientSecret)
     {
         parent::__construct();
-        $this->port = config('shahin.port');
     }
 
     public function getParams(): array
