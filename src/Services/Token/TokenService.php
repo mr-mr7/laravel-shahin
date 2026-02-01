@@ -24,16 +24,13 @@ class TokenService extends ShahinService
     /**
      * Retrieve Saved token or create if need
      */
-    public function getToken($bank = null, $clientId = null, $clientSecret = null, $createIfNotExists = true): string
+    public function getToken($bank = null, $createIfNotExists = true): string
     {
-        $tokenStorage = app(TokenStorageInterface::class);
-        $bank = $bank ?? Shahin::bank();
-        if (! $tokenStorage->has($bank) && $createIfNotExists) {
-            $this->setToken($bank, $clientId, $clientSecret);
+        try {
+            return $this->getValueFromToken('access_token', $bank, $createIfNotExists);
+        } catch (ShahinTokenNotFoundException $exception) {
+            return '';
         }
-        $tokenData = $tokenStorage->get($bank);
-
-        return $tokenData['access_token'] ?? '';
     }
 
     /**
@@ -56,12 +53,12 @@ class TokenService extends ShahinService
         return $this->getValueFromToken('accounts') ?? [];
     }
 
-    private function getValueFromToken($key)
+    private function getValueFromToken($key, $bank = null, $createIfNotExists = true)
     {
         $tokenStorage = app(TokenStorageInterface::class);
-        $bank = Shahin::bank();
+        $bank = $bank ?? Shahin::bank();
 
-        if (! $tokenStorage->has($bank)) {
+        if (! $tokenStorage->has($bank) && $createIfNotExists) {
             $this->setToken($bank);
         }
         $tokenData = $tokenStorage->get($bank);
