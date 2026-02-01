@@ -9,6 +9,26 @@ use Mrmr7\LaravelShahin\Services\ShahinService;
 
 class AccountService extends ShahinService
 {
+    public function accountInfo($sourceAccount = null): array
+    {
+        $bank = Shahin::bank();
+        $nationalCode = Shahin::token()->getUsername();
+        $allAccounts = Shahin::token()->getAccounts();
+
+        if (! is_null($sourceAccount) && ! in_array($sourceAccount, $allAccounts)) {
+            throw new ShahinException('شماره حساب مجاز نمیباشد');
+        }
+
+        $allowedAccounts = ! is_null($sourceAccount) ? [$sourceAccount] : $allAccounts;
+        $requests = [];
+
+        foreach ($allowedAccounts as $allowedAccount) {
+            $requests[] = new AccountInfoRequest($bank, $nationalCode, $allowedAccount);
+        }
+
+        return $this->sendRequest($sourceAccount ? $requests[0] : $requests, 'respObject');
+    }
+
     /**
      * @throws ShahinException
      */
