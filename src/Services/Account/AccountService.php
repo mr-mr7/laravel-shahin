@@ -29,9 +29,6 @@ class AccountService extends ShahinService
         return $this->sendRequest($sourceAccount ? $requests[0] : $requests, 'respObject');
     }
 
-    /**
-     * @throws ShahinException
-     */
     public function accountStatement($sourceAccount = null, ?Carbon $fromDateTime = null, ?Carbon $toDateTime = null): array
     {
         $bank = Shahin::bank();
