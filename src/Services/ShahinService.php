@@ -42,14 +42,14 @@ abstract class ShahinService
         $multiRequest = is_array($request);
         $requests = is_array($request) ? $request : [$request];
 
-        $poolResponses = Http::pool(function (Pool $pool) use ($requests) {
+        $poolResponses = Http::pool(function (Pool $pool) use ($requests, $multiRequest) {
             $poolRequests = [];
             $i = 0;
             foreach ($requests as $requestItem) {
                 $method = $requestItem->method;
                 $baseUrl = "$this->baseUrl:".$requestItem->port().'/v'.$requestItem->urlVersion();
 
-                $key = class_basename($requestItem).'-'.$i++;
+                $key = $multiRequest && $requestItem->requestKey() ? $requestItem->requestKey() : $i++;
 
                 $pendingRequest = $pool->as($key)->baseUrl($baseUrl);
 
@@ -84,11 +84,11 @@ abstract class ShahinService
 
         $responses = [];
         foreach ($poolResponses as $key => $poolResponse) {
-            $relatedRequest = $request[explode('-', $key)[1]];
+            $relatedRequest = $request[$key];
             if ($poolResponse instanceof ConnectionException) {
                 $responses['errors'][$key] = $poolResponse->getMessage();
             } elseif ($relatedRequest->successResponseCondition($poolResponse)) {
-                $responses['data'][] = $poolResponse->json($responseKey);
+                $responses['data'][$key] = $poolResponse->json($responseKey);
             } else {
                 $responses['errors'][$key] = $poolResponse->body();
             }

@@ -26,6 +26,8 @@ abstract class Request
 
     protected array $params = [];
 
+    protected ?string $requestKey = null;
+
     public function __construct()
     {
         $this->isSandbox = config('shahin.sandbox');
@@ -65,5 +67,21 @@ abstract class Request
     public function urlVersion(): string
     {
         return $this->urlVersion;
+    }
+
+    /**
+     * وقتی درخواست هامون از نوع multiRequest هست میتونیم برای هر درخواست یه کلید ست کنیم
+     * اگه ست نکنیم از مقدار $i++ به عنوان کلید استفاده میشه
+     */
+    public function setRequestKey(string $requestKey): self
+    {
+        $this->requestKey = $requestKey;
+
+        return $this;
+    }
+
+    public function requestKey(): ?string
+    {
+        return $this->requestKey;
     }
 }
